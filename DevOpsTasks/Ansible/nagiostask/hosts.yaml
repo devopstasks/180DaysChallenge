@@ -1,0 +1,94 @@
+all:
+  children:
+    Centos:
+      hosts:
+        192.168.233.207:
+          Prerequisite_packages_list:
+            - gcc
+            - glibc
+            - glibc-common
+            - wget
+            - unzip
+            - httpd
+            - php
+            - gd
+            - gd-devel
+            - perl
+            - postfix
+            - gettext
+            - automake
+            - autoconf
+            - openssl-devel
+            - net-snmp
+            - net-snmp-utils
+            - epel-release
+            - perl-Net-SNMP
+            - python-pip
+            - python-passlib
+          
+          install_commands_list:
+            #Compile Code
+            - sudo ./configure > configure.log && sudo make all > makeoutput.log
+            #Create User and Group
+            - sudo make install-groups-users > installgroups.log && usermod -a -G nagios apache > usermod.log
+            #Install Binaries
+            - sudo make install > makeinstall.log
+            #Install Service / Daemon
+            - sudo make install-daemoninit > daemoninit.log
+            #Install Command Mode
+            - sudo make install-commandmode > commandmode.log
+            #Install Configuration Files
+            - sudo make install-config > config.log
+            #Install Apache Config Files
+            - sudo make install-webconf > webconf.log
+            # Configure Firewall
+            - sudo firewall-cmd --zone=public --add-port=80/tcp
+            - sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+          
+          services_list:
+            - httpd
+            - nagios
+    Ubuntu:
+      hosts:
+        192.168.233.206:
+          Prerequisite_packages_list:
+            - autoconf
+            - gcc
+            - libc6
+            - make
+            - wget
+            - unzip
+            - apache2
+            - php
+            - libapache2-mod-php7.2
+            - libgd-dev
+            - libmcrypt-dev
+            - libssl-dev
+            - bc
+            - gawk
+            - dc
+            - build-essential
+            - snmp
+            - libnet-snmp-perl
+            - gettext
+            - python-pip
+          
+          install_commands_list:
+            #Compile Code
+            - sudo ./configure --with-httpd-conf=/etc/apache2/sites-enabled > configure.log && sudo make all > makeoutput.log
+            #Create User and Group
+            - sudo make install-groups-users > installgroups.log && sudo usermod -a -G nagios www-data > usermod.log
+            #Install Binaries
+            - sudo make install > makeinstall.log
+            #Install Service / Daemon
+            - sudo make install-daemoninit > daemoninit.log
+            #Install Command Mode
+            - sudo make install-commandmode > commandmode.log
+            #Install Configuration Files
+            - sudo make install-config > config.log
+            #Install Apache Config Files
+            - sudo make install-webconf > webconf.log && sudo a2enmod rewrite > a2enmodrewrite.log && sudo a2enmod cgi > cgi.log
+          
+          services_list:
+            - apache2
+            - nagios
